@@ -1,34 +1,28 @@
 from fastapi import FastAPI, HTTPException, status
-from models import Curso
+from models import Curso, cursos
 from fastapi.responses import JSONResponse, Response
 from fastapi import Path, Query, Header
-from typing import Optional
+from typing import Optional, Dict, List
 
 
-app = FastAPI()
-
-cursos = {
-    1: {
-        "titulo": "Programação para leigos",
-        "aulas": 112,
-        "horas": 58
-    },
-    2: {
-        "titulo": "Algoritmos e lógica de programação",
-        "aulas": 87,
-        "horas": 67
-    },
-}
+app = FastAPI(title="API de cursos", summary="API para estudos do FastAPI", version="0.0.1k")
 
 
-@app.get("/cursos")
+
+
+@app.get("/cursos",
+         description="Retorna uma lista com todos os cursos",
+         summary="Retorna os cursos",
+         response_model=List[Curso],
+         response_description="Cursos encontrados com sucesso")
 async def get_cursos():
     return cursos
 
 
-@app.get("/cursos/{curso_id}")
-async def get_curso(curso_id: int = Path(title='ID do curso',
-                                         description='Deve ser entre 1 e 2', gt=0, lt=3)):
+@app.get("/cursos/{curso_id}", response_model=Curso)
+async def get_curso(
+        curso_id: int = Path(title='ID do curso',description='Deve ser entre 1 e 2', gt=0, lt=3)
+    ):
     try:
         return cursos[curso_id]
     except KeyError:
@@ -37,12 +31,10 @@ async def get_curso(curso_id: int = Path(title='ID do curso',
 
 @app.post("/cursos", status_code=status.HTTP_201_CREATED)
 async def post_curso(curso: Curso):
-    if curso.id in cursos:
-        raise HTTPException(status.HTTP_409_CONFLICT, f"Já existe um curso com id {curso.id}")
 
-    new_curso_id = curso.id or max(cursos) + 1 
-    cursos[new_curso_id] = curso
-    del curso.id
+    new_curso_id = max([curso.id for curso in cursos]) + 1 
+    curso.id = new_curso_id
+    cursos.append(curso)
 
 
 @app.put("/cursos/{curso_id}")
