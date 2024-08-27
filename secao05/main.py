@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from api.router import router
 
-app = FastAPI()
+app = FastAPI(title="API de cursos")
 app.include_router(router)
 
 

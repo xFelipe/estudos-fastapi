@@ -6,7 +6,7 @@ from models.curso import CursoModel, UpdateCursoSchema
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter(prefix="/cursos")
+router = APIRouter(prefix="/cursos", tags=["curso"])
 
 
 @router.get("/", response_model=List[CursoModel])
